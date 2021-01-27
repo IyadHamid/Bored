@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Ball">
+      <UniqueIdentifier>{42192d3b-195a-4b54-9717-e8489ed2e83e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FFT">
+      <UniqueIdentifier>{75f1ca30-4ca6-4109-965c-a657f9a73923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TitleBar">
+      <UniqueIdentifier>{4512c610-27b5-443b-80d7-d2d9fa62c0a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SamplerRecorder">
+      <UniqueIdentifier>{c705416b-8852-40ae-9fc4-f45ce6cf0ab7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SampleDraw">
+      <UniqueIdentifier>{2335b443-5183-4f2b-b67a-020b2d4881e9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Ball.cpp">
+      <Filter>Ball</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FFT.cpp">
+      <Filter>FFT</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SampleDraw.cpp">
+      <Filter>SampleDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SamplerRecorder.cpp">
+      <Filter>SamplerRecorder</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TitleBar.cpp">
+      <Filter>TitleBar</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Ball.hpp">
+      <Filter>Ball</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FFT.h">
+      <Filter>FFT</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SampleDraw.h">
+      <Filter>SampleDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SamplerRecorder.hpp">
+      <Filter>SamplerRecorder</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TitleBar.hpp">
+      <Filter>TitleBar</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CommonMath.h" />
+  </ItemGroup>
+</Project>
