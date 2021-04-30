@@ -17,7 +17,6 @@
 
 sf::Text fps;
 
-
 int main() {
     if (!sf::SoundRecorder::isAvailable())
         return 1;
@@ -38,8 +37,8 @@ int main() {
     TitleBar titleBar(sf::Vector2f(res.x, 32));
 
     const size_t chunk = 2048;
-    const float inner = 350;
-    const float outer = 150;
+    const float inner = 300;
+    const float outer = 200;
 
     std::vector<double> psamples(chunk);
     std::vector<double> windowSample;
@@ -103,28 +102,29 @@ int main() {
             }
         }
 
-        std::vector<sf::Int16> samples = input.getData();
-        drawWaveInCircle(window, samples, center, inner);
+        auto samples = input.getData();
 
         samples.resize(chunk * 2);
 
         CArray samplesL(chunk), samplesR(chunk);
 
+        //Set to 1 to not break ratio.
+        double amplitudeL = 1.0, amplitudeR = 1.0;
+
         for (size_t i = 0; i < chunk; i++) {
             samplesL[i] = windowSample[i] * samples[i * 2 + 0];
             samplesR[i] = windowSample[i] * samples[i * 2 + 1];
+            amplitudeL  = std::max(amplitudeL, samplesL[i].real());
+            amplitudeR  = std::max(amplitudeR, samplesR[i].real());
         }
+
+        double amplitudeRatio = amplitudeL / amplitudeR; //Not used
+
         fft(samplesL);
         fft(samplesR);
 
-        std::vector<double> samplesT(chunk);
-        for (size_t i = 0; i < chunk / 2; i++) {
-            samplesT[i]             = samplesL[i].real();
-            samplesT[chunk - 1 - i] = samplesR[i].real();
-        }
-
-        drawAudioCircle(window, samplesT, psamples, chunk, center, inner, outer);
-
+        drawWaveInCircle(window, samples, center, inner);
+        drawAudioCircle(window, samplesL, samplesR, chunk, center, inner, outer);
         ball.tick(dt, center);
         window.draw(ball);
 
@@ -135,7 +135,6 @@ int main() {
     }
     return 0;
 }
-
 
 int WinMain() {
     return main();
