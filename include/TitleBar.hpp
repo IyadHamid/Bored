@@ -6,7 +6,7 @@ class TitleBar : public sf::Drawable {
 public:
 	TitleBar(sf::Vector2f size);
 
-	void tick(sf::Vector2f cursor);
+	void tick(sf::Vector2i cursor);
 
 	sf::FloatRect titleBarRect, closeRect;
 
@@ -14,7 +14,8 @@ protected:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 	sf::Vector2f size;
-	
+	sf::Text titleText;
+	sf::Font font;
 	sf::RectangleShape titleBarShape;
 	sf::VertexBuffer closeShape;
 };

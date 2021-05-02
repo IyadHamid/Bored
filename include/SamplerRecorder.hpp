@@ -9,12 +9,11 @@
 class SamplerRecorder : public sf::SoundRecorder {
 public:
     SamplerRecorder(sf::Int32 interval = 100);
-
-    std::vector<sf::Int16> getData();
+    ~SamplerRecorder();
 
     void setDeviceSearch(const std::string &searchName);
 
-    ~SamplerRecorder();
+    std::vector<sf::Int16> getData();
 
 protected:
 
@@ -27,5 +26,6 @@ protected:
     std::atomic<bool> isRecording{ false };
     std::mutex mutex;
     std::condition_variable cv;
-    std::vector<sf::Int16> data;
+    std::vector<sf::Int16> data;  //New data
+    std::vector<sf::Int16> pdata; //Previous data
 };

@@ -6,16 +6,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
+#include "AudioData.hpp"
 #include "SamplerRecorder.hpp"
 #include "FFT.h"
 #include "CommonMath.h"
 #include "Ball.hpp"
 #include "TitleBar.hpp"
 #include "SampleDraw.h"
-
-
-
-sf::Text fps;
 
 int main() {
     if (!sf::SoundRecorder::isAvailable())
@@ -36,14 +33,14 @@ int main() {
 
     TitleBar titleBar(sf::Vector2f(res.x, 32));
 
-    const size_t chunk = 2048;
+    const size_t chunk = 4096;
     const float inner = 300;
     const float outer = 200;
 
     std::vector<double> psamples(chunk);
     std::vector<double> windowSample;
     for (size_t i = 0; i < chunk; i++)
-        windowSample.push_back(hanningWindow((double)i, (double)chunk));
+        windowSample.push_back(hanningWindow(i, chunk));
 
     Ball ball(25, inner);
     ball.setPhysics(7000, .0001, 1.5);
@@ -103,29 +100,12 @@ int main() {
         }
 
         auto samples = input.getData();
+        AudioData data(samples, chunk, windowSample);
 
-        samples.resize(chunk * 2);
-
-        CArray samplesL(chunk), samplesR(chunk);
-
-        //Set to 1 to not break ratio.
-        double amplitudeL = 1.0, amplitudeR = 1.0;
-
-        for (size_t i = 0; i < chunk; i++) {
-            samplesL[i] = windowSample[i] * samples[i * 2 + 0];
-            samplesR[i] = windowSample[i] * samples[i * 2 + 1];
-            amplitudeL  = std::max(amplitudeL, samplesL[i].real());
-            amplitudeR  = std::max(amplitudeR, samplesR[i].real());
-        }
-
-        double amplitudeRatio = amplitudeL / amplitudeR; //Not used
-
-        fft(samplesL);
-        fft(samplesR);
-
-        drawWaveInCircle(window, samples, center, inner);
-        drawAudioCircle(window, samplesL, samplesR, chunk, center, inner, outer);
+        drawWaveInCircle(window, data, center, inner);
+        drawAudioCircle(window, data, center, inner, outer);
         ball.tick(dt, center);
+        titleBar.tick(mouse.getPosition());
         window.draw(ball);
 
         window.draw(titleBar);

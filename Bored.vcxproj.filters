@@ -16,6 +16,9 @@
     <Filter Include="SampleDraw">
       <UniqueIdentifier>{2335b443-5183-4f2b-b67a-020b2d4881e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AudioData">
+      <UniqueIdentifier>{dc0c9320-bbe1-478f-8e84-e65ff495811c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Ball.cpp">
@@ -34,6 +37,9 @@
       <Filter>TitleBar</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\AudioData.cpp">
+      <Filter>AudioData</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Ball.hpp">
@@ -52,5 +58,8 @@
       <Filter>TitleBar</Filter>
     </ClInclude>
     <ClInclude Include="include\CommonMath.h" />
+    <ClInclude Include="include\AudioData.hpp">
+      <Filter>AudioData</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

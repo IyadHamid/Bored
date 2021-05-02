@@ -2,8 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-extern sf::Text fps;
-
 class Ball : public sf::Drawable {
 public:
 	Ball(float radius, float maxRange, sf::Vector2f pos = sf::Vector2f(0, 0), size_t points = 50);

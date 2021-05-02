@@ -2,25 +2,24 @@
 
 #include <algorithm>
 
-#include <iostream>
 #include "CommonMath.h"
 
 const double modifier(double x, const double outer, const double inner) {
-    const auto equ = [outer](double x) {return -outer * std::exp2(-.01 * x); };
+    const auto equ = [outer](double x) {return -outer * std::exp2(-.00001 * x); };
     const double intercept = equ(0);
     return equ(x) - intercept + inner;
 }
 
-void drawWaveInCircle(sf::RenderWindow& window, std::vector<sf::Int16> samples, sf::Vector2f center, float radius) {
+void drawWaveInCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, float radius) {
     std::vector<sf::Vertex> va;
     static float waveAmplitude = 0;
     float nextWaveAmplitude = 0;
 
-    for (size_t i = 0; i < samples.size(); i += 4) {
-        sf::Vector2f pos((float)i / samples.size() * 2 * radius - radius, samples[i] / (waveAmplitude + 1.f) * radius / 4.f);
+    for (size_t i = 0; i < data.samples.size(); i += 4) {
+        sf::Vector2f pos((float)i / data.samples.size() * 2 * radius - radius, data.samples[i] / (waveAmplitude + 1.f) * radius / 4.f);
         
-        if (abs(samples[i]) > nextWaveAmplitude)
-            nextWaveAmplitude = abs(samples[i]);
+        if (abs(data.samples[i]) > nextWaveAmplitude)
+            nextWaveAmplitude = abs(data.samples[i]);
         if (len(pos) > radius)
             pos.y = sqrt(1 - pos.x * pos.x) * (pos.y > 0 ? 1 : -1);
         pos += center;
@@ -31,11 +30,11 @@ void drawWaveInCircle(sf::RenderWindow& window, std::vector<sf::Int16> samples, 
     window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
 }
 
-void drawAudioCircle(sf::RenderWindow& window, CArray samplesL, CArray samplesR, size_t chunk, sf::Vector2f center, double inner, double outer) {
+void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer) {
     std::vector<sf::Vertex> va;
 
     bool left = true;
-    for (size_t i = 0, il = 0, ir = 0; i < chunk; i++) {
+    for (size_t i = 0, il = 0, ir = 0; i < data.chunk; i++) {
         //Frequency shift from octave
         double shift = fmod(std::log2(1 + (left ? il : ir)), 1.0);
         if (isnan(shift))
@@ -55,7 +54,7 @@ void drawAudioCircle(sf::RenderWindow& window, CArray samplesL, CArray samplesR,
             va.clear();
         }
 
-        double value = abs(left ? samplesL[il].real() : samplesR[ir].real()) / 500;
+        double value = abs(left ? data.samplesL[il].real() : data.samplesR[ir].real());
         
         value = modifier(value, outer, inner);
 
@@ -75,7 +74,4 @@ void drawAudioCircle(sf::RenderWindow& window, CArray samplesL, CArray samplesR,
         else
             ir--;
     }
-    //for (int i = 0; i < 8; i++)
-    //    va[i].color = sf::Color(0.0, 0.0, 0.0);
-    //va.push_back(va[0]); //Finish loop
 }

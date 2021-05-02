@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AudioData.cpp" />
     <ClCompile Include="src\Ball.cpp" />
     <ClCompile Include="src\FFT.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="src\TitleBar.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AudioData.hpp" />
     <ClInclude Include="include\Ball.hpp" />
     <ClInclude Include="include\CommonMath.h" />
     <ClInclude Include="include\FFT.h" />
