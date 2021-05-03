@@ -26,6 +26,5 @@ protected:
     std::atomic<bool> isRecording{ false };
     std::mutex mutex;
     std::condition_variable cv;
-    std::vector<sf::Int16> data;  //New data
-    std::vector<sf::Int16> pdata; //Previous data
+    std::vector<sf::Int16> data;
 };

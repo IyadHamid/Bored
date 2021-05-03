@@ -5,7 +5,8 @@
 #include "CommonMath.h"
 
 const double modifier(double x, const double outer, const double inner) {
-    const auto equ = [outer](double x) {return -outer * std::exp2(-.00001 * x); };
+    //const auto equ = [outer](double x) {return -outer * std::exp2(-.00001 * x); };
+    const auto equ = [outer](double x) {return -outer * std::exp2(-0.02 * x); };
     const double intercept = equ(0);
     return equ(x) - intercept + inner;
 }
@@ -47,7 +48,7 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         }
         else if (shift == 0 && !left) {
             left = true;
-            if (va.size() >= 16) {
+            if (va.size() >= 32) {
                 va.push_back(va[0]); //Finish loop
                 window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
             }
@@ -55,7 +56,7 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         }
 
         double value = abs(left ? data.samplesL[il].real() : data.samplesR[ir].real());
-        
+        value /= data.amplitude;
         value = modifier(value, outer, inner);
 
       
@@ -65,7 +66,6 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         sf::Vector2f pos(value * sin(angle), value * cos(angle));
         pos += center;
         double shade = std::clamp((value - inner) / outer * 255, 0.0, 255.0);
-        //va[i] = sf::Vertex(pos, sf::Color((sf::Uint8)shade, 255, 255));
         va.emplace_back(pos, sf::Color((sf::Uint8)shade, 255, 255));
 
 

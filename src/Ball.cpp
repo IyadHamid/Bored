@@ -65,7 +65,7 @@ void Ball::tick(float dt, sf::Vector2f center) {
         }
 
         mag = len(vel);
-        if (!mag == 0) {
+        if (mag != 0) {
             sf::Vector2f dragForce = -vel / mag;
             dragForce *= mag * mag * drag;
             addImpulse(dragForce);

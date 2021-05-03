@@ -33,7 +33,7 @@ int main() {
 
     TitleBar titleBar(sf::Vector2f(res.x, 32));
 
-    const size_t chunk = 4096;
+    const size_t chunk = 2048;
     const float inner = 300;
     const float outer = 200;
 
@@ -48,9 +48,10 @@ int main() {
     SamplerRecorder input(50);
     input.setDeviceSearch("stereomix");
     input.setChannelCount(2);
-
     input.start();
 
+    window.setFramerateLimit(4.0 / 0.05);
+    
     bool gainedFocus = false;
 
     while (window.isOpen()) {
@@ -104,10 +105,11 @@ int main() {
 
         drawWaveInCircle(window, data, center, inner);
         drawAudioCircle(window, data, center, inner, outer);
+        
         ball.tick(dt, center);
         titleBar.tick(mouse.getPosition());
-        window.draw(ball);
 
+        window.draw(ball);
         window.draw(titleBar);
 
         window.display();

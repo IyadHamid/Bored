@@ -5,7 +5,6 @@
 
 SamplerRecorder::SamplerRecorder(sf::Int32 interval) {
     sf::SoundRecorder::setProcessingInterval(sf::milliseconds(interval));
-    pdata = std::vector<sf::Int16>();
 }
 
 SamplerRecorder::~SamplerRecorder() {
@@ -36,9 +35,7 @@ std::vector<sf::Int16> SamplerRecorder::getData() {
      cv.wait(lock, [this] { return !isRecording || !data.empty(); });
      if (isRecording) {
          assert(!data.empty());
-         auto temp(data);
-         temp.insert(temp.end(), pdata.begin(), pdata.end());
-         return temp;
+         return data;
      }
      return std::vector<sf::Int16>();
  }
@@ -48,7 +45,6 @@ std::vector<sf::Int16> SamplerRecorder::getData() {
  bool SamplerRecorder::onProcessSamples(sf::Int16 const* samples, std::size_t sampleCount) {
      {
          std::lock_guard<std::mutex> lock(mutex);
-         pdata = data;
          data = std::vector<sf::Int16>(samples, samples + sampleCount);
      }
      cv.notify_one();
