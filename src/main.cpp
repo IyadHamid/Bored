@@ -50,9 +50,11 @@ int main() {
     input.setChannelCount(2);
     input.start();
 
-    window.setFramerateLimit(4.0 / 0.05);
+    //window.setFramerateLimit(4.0 / 0.05);
     
     bool gainedFocus = false;
+
+    AudioData data(input.getData(), chunk, windowSample);
 
     while (window.isOpen()) {
 
@@ -101,10 +103,10 @@ int main() {
         }
 
         auto samples = input.getData();
-        AudioData data(samples, chunk, windowSample);
+        data.update(samples, windowSample, dt);
 
         drawWaveInCircle(window, data, center, inner);
-        drawAudioCircle(window, data, center, inner, outer);
+        drawAudioCircle(window, data, center, inner, outer, dt);
         
         ball.tick(dt, center);
         titleBar.tick(mouse.getPosition());

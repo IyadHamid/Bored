@@ -5,7 +5,6 @@
 #include "CommonMath.h"
 
 const double modifier(double x, const double outer, const double inner) {
-    //const auto equ = [outer](double x) {return -outer * std::exp2(-.00001 * x); };
     const auto equ = [outer](double x) {return -outer * std::exp2(-0.02 * x); };
     const double intercept = equ(0);
     return equ(x) - intercept + inner;
@@ -31,8 +30,10 @@ void drawWaveInCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cen
     window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
 }
 
-void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer) {
+void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer, double dt) {
     std::vector<sf::Vertex> va;
+
+    static AudioData prevData(data);
 
     bool left = true;
     for (size_t i = 0, il = 0, ir = 0; i < data.chunk; i++) {
@@ -74,4 +75,6 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         else
             ir--;
     }
+
+    prevData = data;
 }
