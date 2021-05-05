@@ -7,7 +7,7 @@
 Ball::Ball(float r, float maxRange, sf::Vector2f p, size_t pts) : radius(r), range(maxRange - r), pos(p) {
 	shape = sf::CircleShape(radius, pts);
     vel = { 0, 0 };
-    impulse = { 0, 0 };
+    force = { 0, 0 };
     shape.setOrigin(radius, radius);
     shape.setFillColor(sf::Color(0x22, 0xcc, 0x22));
 
@@ -42,36 +42,39 @@ void Ball::setVisibility(bool visible, float time) {
         timeVisible = timeTotal = time;
 }
 
-void Ball::addImpulse(float impulseX, float impulseY) {
-    impulse.x += impulseX;
-    impulse.y += impulseY;
+void Ball::addForce(float forceX, float forceY) {
+    force.x += forceX;
+    force.y += forceY;
 }
 
-void Ball::addImpulse(sf::Vector2f f) {
-    impulse += f;
+void Ball::addForce(sf::Vector2f f) {
+    force += f;
 }
 
-void Ball::tick(float dt, sf::Vector2f center) {
+void Ball::tick(sf::Vector2f center, float amplitude, float dt) {
     if (timeVisible > 0) {
-        vel += impulse * dt;
-        impulse = { 0, 0 };
+        vel += force * dt;
+        force = { 0, 0 };
 
         pos += vel * dt;
-        float mag = len(pos);
-        if (mag > range) {
-            pos /= mag;
+        float posMag = len(pos);
+        if (posMag != 0) {
+        }
+        if (posMag > range) {
+            addForce(-pos / posMag * amplitude * 3000.f);
+            pos /= posMag;
             vel = vel - pos * bouncy * dot(vel, pos);
             pos *= range;
         }
 
-        mag = len(vel);
-        if (mag != 0) {
-            sf::Vector2f dragForce = -vel / mag;
-            dragForce *= mag * mag * drag;
-            addImpulse(dragForce);
+        float velMag = len(vel);
+        if (velMag != 0) {
+            sf::Vector2f dragForce = -vel / velMag;
+            dragForce *= velMag * velMag * drag;
+            addForce(dragForce);
         }
 
-        addImpulse(0, gravity);
+        addForce(0, gravity);
 
         shape.setPosition(pos + center);
 

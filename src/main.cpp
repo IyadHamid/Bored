@@ -9,15 +9,12 @@
 #include "AudioData.hpp"
 #include "SamplerRecorder.hpp"
 #include "FFT.h"
-#include "CommonMath.h"
 #include "Ball.hpp"
 #include "TitleBar.hpp"
 #include "SampleDraw.h"
 
 int main() {
     if (!sf::SoundRecorder::isAvailable())
-        return 1;
-    if (!sf::Shader::isAvailable())
         return 1;
 
     sf::ContextSettings settings{};
@@ -84,9 +81,9 @@ int main() {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
                 window.close();
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                ball.addImpulse(-10000, 0);
+                ball.addForce(-10000, 0);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                ball.addImpulse(10000, 0);
+                ball.addForce(10000, 0);
             if (mouseDrag) {
                 sf::Vector2f dPos;
                 dPos = sf::Vector2f(window.getPosition());
@@ -108,7 +105,7 @@ int main() {
         drawWaveInCircle(window, data, center, inner);
         drawAudioCircle(window, data, center, inner, outer, dt);
         
-        ball.tick(dt, center);
+        ball.tick(center, data.amplitude, dt);
         titleBar.tick(mouse.getPosition());
 
         window.draw(ball);

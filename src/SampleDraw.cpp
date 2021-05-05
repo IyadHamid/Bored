@@ -37,8 +37,10 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
 
     bool left = true;
     for (size_t i = 0, il = 0, ir = 0; i < data.chunk; i++) {
+
+        double relativeFreq = std::log2(1 + (left ? il : ir));
         //Frequency shift from octave
-        double shift = fmod(std::log2(1 + (left ? il : ir)), 1.0);
+        double shift = fmod(relativeFreq, 1.0);
         if (isnan(shift))
             shift = 0;
 
@@ -58,6 +60,7 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
 
         double value = abs(left ? data.samplesL[il].real() : data.samplesR[ir].real());
         value /= data.amplitude;
+        value *= std::log10(relativeFreq);
         value = modifier(value, outer, inner);
 
       
@@ -67,7 +70,8 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         sf::Vector2f pos(value * sin(angle), value * cos(angle));
         pos += center;
         double shade = std::clamp((value - inner) / outer * 255, 0.0, 255.0);
-        va.emplace_back(pos, sf::Color((sf::Uint8)shade, 255, 255));
+        sf::Color color(shade, 255, 255 );
+        va.emplace_back(pos, color);
 
 
         if (left)
