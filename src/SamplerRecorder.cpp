@@ -30,22 +30,25 @@ void SamplerRecorder::setDeviceSearch(const std::string& searchName) {
     sf::SoundRecorder::setDevice(deviceNames[0]);
 }
 
-std::vector<sf::Int16> SamplerRecorder::getData() {
+std::pair<std::vector<sf::Int16>, bool> SamplerRecorder::getData() {
      std::unique_lock<std::mutex> lock(mutex);
      cv.wait(lock, [this] { return !isRecording || !data.empty(); });
      if (isRecording) {
          assert(!data.empty());
-         return data;
+         std::pair<std::vector<sf::Int16>, bool> ret(data, isNew);
+         isNew = false;
+         return ret;
      }
-     return std::vector<sf::Int16>();
+     return {};
  }
 
 
 
- bool SamplerRecorder::onProcessSamples(sf::Int16 const* samples, std::size_t sampleCount) {
+ bool SamplerRecorder::onProcessSamples(const sf::Int16* samples, size_t sampleCount) {
      {
          std::lock_guard<std::mutex> lock(mutex);
          data = std::vector<sf::Int16>(samples, samples + sampleCount);
+         isNew = true;
      }
      cv.notify_one();
      return true;

@@ -13,11 +13,11 @@ public:
 
     void setDeviceSearch(const std::string &searchName);
 
-    std::vector<sf::Int16> getData();
+    std::pair<std::vector<sf::Int16>, bool> getData();
 
 protected:
 
-    bool onProcessSamples(sf::Int16 const* samples, std::size_t sampleCount) override;
+    bool onProcessSamples(const sf::Int16* samples, size_t sampleCount) override;
 
     bool onStart() override;
 
@@ -27,4 +27,5 @@ protected:
     std::mutex mutex;
     std::condition_variable cv;
     std::vector<sf::Int16> data;
+    bool isNew{ true };
 };

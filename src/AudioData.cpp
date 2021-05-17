@@ -7,12 +7,17 @@ AudioData::AudioData(std::vector<sf::Int16> samples, const size_t chunk, const s
 	init(window);
 }
 
-void AudioData::update(std::vector<sf::Int16> newSamples, const std::vector<double> window, double dt) {
-	double factor = .9 - std::exp(-dt);
+void AudioData::update(std::vector<sf::Int16> newSamples, bool isNew, const std::vector<double> window, double dt) {
+	const double factor = 1.0 - std::exp(-dt * 50.0);
 	for (size_t i = 0; i < samples.size(); i++) {
-		samples[i] = samples[i] + factor * ((double)samples[i] - newSamples[i]);
+		const double curr = newSamples[i];
+		const double prev = samples[i];
+
+		samples[i] = prev + factor * (curr - prev);
 	}
+	auto oldAmplitude = amplitude;
 	init(window);
+	smoothedAmplitude = oldAmplitude + factor * (amplitude - oldAmplitude);
 }
 
 void AudioData::init(const std::vector<double> window) {

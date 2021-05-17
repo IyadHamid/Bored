@@ -6,7 +6,7 @@ class TitleBar : public sf::Drawable {
 public:
 	TitleBar(sf::Vector2f size);
 
-	void tick(sf::Vector2i cursor);
+	void tick(std::string str);
 
 	sf::FloatRect titleBarRect, closeRect;
 

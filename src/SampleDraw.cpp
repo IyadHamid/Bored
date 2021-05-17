@@ -1,6 +1,7 @@
 #include "SampleDraw.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "CommonMath.h"
 
@@ -12,29 +13,49 @@ const double modifier(double x, const double outer, const double inner) {
 
 void drawWaveInCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, float radius) {
     std::vector<sf::Vertex> va;
-    static float waveAmplitude = 0;
-    float nextWaveAmplitude = 0;
 
-    for (size_t i = 0; i < data.samples.size(); i += 4) {
-        sf::Vector2f pos((float)i / data.samples.size() * 2 * radius - radius, data.samples[i] / (waveAmplitude + 1.f) * radius / 4.f);
-        
-        if (abs(data.samples[i]) > nextWaveAmplitude)
-            nextWaveAmplitude = abs(data.samples[i]);
+    for (size_t i = 0; i < data.samples.size(); i++) {
+        const auto percent = (float)i / data.samples.size();
+        sf::Vector2f pos(percent * 2.f * radius - radius, (data.samples[i] / data.smoothedAmplitude) * (radius / 4.f));
         if (len(pos) > radius)
             pos.y = sqrt(1 - pos.x * pos.x) * (pos.y > 0 ? 1 : -1);
-        pos += center;
-        va.emplace_back(pos);
+        va.emplace_back(pos + center, sf::Color(200, 200, 200));
     }
 
-    waveAmplitude = (waveAmplitude * 2 + nextWaveAmplitude) / 3.f;
     window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
+}
+
+sf::Color vertexColorCircle(const double value, const double inner, const double outer) {
+    double shade = (value - inner) / outer;
+    shade = shade * 25 + 200.0;
+    shade = std::clamp(shade, 0.0, 255.0);
+    return sf::Color(0, shade, shade);
+}
+
+void subdivideCircle(std::vector<sf::Vertex>& va, std::vector<std::pair<double, double>>& values, double inner, double outer, sf::Vector2f center) {
+    va.reserve(va.size() * 2);
+    const double vaSize = va.size();
+    for (size_t i = vaSize - 1; i > 0; i--) {
+
+        const double angle = atan2(sin(values[i].second) + sin(values[i - 1].second), cos(values[i].second) + cos(values[i - 1].second));
+        const double ratio = values[i].first > values[i - 1].first ? 0.1 : 0.9;
+        double value = values[i].first * ratio + values[i - 1].first * (1.0 - ratio);
+
+        values.emplace(values.begin() + i, value, angle);
+
+        value = modifier(value, outer, inner);
+
+        const sf::Color color = vertexColorCircle(value, inner, outer);
+        const sf::Vector2f pos(value * sin(angle), value * cos(angle));
+        const sf::Vertex vert(pos + center, color);
+
+        va.insert(va.begin() + i, vert);
+    }
 }
 
 void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer, double dt) {
     std::vector<sf::Vertex> va;
-
-    static AudioData prevData(data);
-
+    std::vector<std::pair<double, double>> values;
     bool left = true;
     for (size_t i = 0, il = 0, ir = 0; i < data.chunk; i++) {
 
@@ -51,34 +72,40 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         }
         else if (shift == 0 && !left) {
             left = true;
-            if (va.size() >= 32) {
+
+            if (va.size() >= 8) {
                 va.push_back(va[0]); //Finish loop
+                values.push_back(values[0]);    
+                //Subdivide
+                while (va.size() <= 64) {
+                    subdivideCircle(va, values, inner, outer, center);
+                }
                 window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
             }
+
             va.clear();
+            values.clear();
         }
 
+        double angle = shift * pi * (left ? -1.0 : 1.0);
+
         double value = abs(left ? data.samplesL[il].real() : data.samplesR[ir].real());
-        value /= data.amplitude;
+        value /= data.smoothedAmplitude;
+
         value *= std::log10(relativeFreq);
+
+        values.emplace_back(value, angle);
+
         value = modifier(value, outer, inner);
 
-      
-        float angle = shift * pi * (left ? -1.0f : 1.0f);
-        
+        const sf::Vector2f pos(value * sin(angle), value * cos(angle));
 
-        sf::Vector2f pos(value * sin(angle), value * cos(angle));
-        pos += center;
-        double shade = std::clamp((value - inner) / outer * 255, 0.0, 255.0);
-        sf::Color color(shade, 255, 255 );
-        va.emplace_back(pos, color);
-
+        const sf::Color color = vertexColorCircle(value, inner, outer);
+        va.emplace_back(pos + center, color);
 
         if (left)
             il++;
         else
             ir--;
     }
-
-    prevData = data;
 }

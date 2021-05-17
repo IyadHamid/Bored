@@ -1,5 +1,5 @@
 #include "TitleBar.hpp"
-#include <iostream>
+
 #include <string>
 
 TitleBar::TitleBar(sf::Vector2f s) : size(s) {
@@ -30,15 +30,8 @@ TitleBar::TitleBar(sf::Vector2f s) : size(s) {
 
 }
 
-void TitleBar::tick(sf::Vector2i cursor) {
-    static sf::Clock clock;
-    static float tfps(1.0);
-    float time = clock.restart().asSeconds();
-
-    float fps = 1.f / time;
-    tfps = (tfps + fps) / 2.f;
-
-    titleText.setString(std::to_string((int)tfps));
+void TitleBar::tick(std::string str) {
+    titleText.setString(str);
 }
 
 void TitleBar::draw(sf::RenderTarget& target, sf::RenderStates states) const {

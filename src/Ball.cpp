@@ -57,17 +57,15 @@ void Ball::tick(sf::Vector2f center, float amplitude, float dt) {
         force = { 0, 0 };
 
         pos += vel * dt;
-        float posMag = len(pos);
-        if (posMag != 0) {
-        }
+        const float posMag = len(pos);
         if (posMag > range) {
-            addForce(-pos / posMag * amplitude * 3000.f);
-            pos /= posMag;
+            pos /= posMag; // pos is temporary dir
+            addForce(-pos * amplitude * 3000.f);
             vel = vel - pos * bouncy * dot(vel, pos);
             pos *= range;
         }
 
-        float velMag = len(vel);
+        const float velMag = len(vel);
         if (velMag != 0) {
             sf::Vector2f dragForce = -vel / velMag;
             dragForce *= velMag * velMag * drag;

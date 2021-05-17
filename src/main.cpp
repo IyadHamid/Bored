@@ -1,5 +1,4 @@
 #include <cassert>
-#include <iostream>
 #include <algorithm>
 #include <chrono>
 
@@ -47,11 +46,11 @@ int main() {
     input.setChannelCount(2);
     input.start();
 
-    //window.setFramerateLimit(4.0 / 0.05);
+    //window.setFramerateLimit(40);
     
     bool gainedFocus = false;
 
-    AudioData data(input.getData(), chunk, windowSample);
+    AudioData data(input.getData().first, chunk, windowSample);
 
     while (window.isOpen()) {
 
@@ -84,6 +83,10 @@ int main() {
                 ball.addForce(-10000, 0);
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
                 ball.addForce(10000, 0);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+                window.setFramerateLimit(40);
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                window.setFramerateLimit(0);
             if (mouseDrag) {
                 sf::Vector2f dPos;
                 dPos = sf::Vector2f(window.getPosition());
@@ -100,15 +103,16 @@ int main() {
         }
 
         auto samples = input.getData();
-        data.update(samples, windowSample, dt);
+        data.update(samples.first, samples.second, windowSample, dt);
+
+        window.draw(ball);
 
         drawWaveInCircle(window, data, center, inner);
         drawAudioCircle(window, data, center, inner, outer, dt);
         
-        ball.tick(center, data.amplitude, dt);
-        titleBar.tick(mouse.getPosition());
+        ball.tick(center, data.amplitude / data.smoothedAmplitude * 100, dt);
+        titleBar.tick("");
 
-        window.draw(ball);
         window.draw(titleBar);
 
         window.display();
