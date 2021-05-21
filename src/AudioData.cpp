@@ -10,6 +10,9 @@ AudioData::AudioData(std::vector<sf::Int16> samples, const size_t chunk, const s
 void AudioData::update(std::vector<sf::Int16> newSamples, bool isNew, const std::vector<double> window, double dt) {
 	const double factor = 1.0 - std::exp(-dt * 50.0);
 	for (size_t i = 0; i < samples.size(); i++) {
+		if (i >= newSamples.size()) [[unlikely]]
+			break;
+
 		const double curr = newSamples[i];
 		const double prev = samples[i];
 

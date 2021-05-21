@@ -46,6 +46,7 @@ int main() {
     input.setChannelCount(2);
     input.start();
 
+    
     //window.setFramerateLimit(40);
     
     bool gainedFocus = false;
