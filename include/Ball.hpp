@@ -12,7 +12,7 @@ public:
 	void addForce(float forceX, float forceY);
 	void addForce(sf::Vector2f force);
 
-	void tick(sf::Vector2f center, float amplitude, float dt);
+	void tick(sf::Vector2f center, float dt);
 	void dragScene(float dt, sf::Vector2f dPos);
 
 protected:

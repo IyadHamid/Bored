@@ -47,8 +47,9 @@ int main() {
     input.start();
 
     
-    //window.setFramerateLimit(40);
-    
+    //window.setFramerateLimit(80);
+    window.setVerticalSyncEnabled(true);
+
     bool gainedFocus = false;
 
     AudioData data(input.getData().first, chunk, windowSample);
@@ -111,7 +112,7 @@ int main() {
         drawWaveInCircle(window, data, center, inner);
         drawAudioCircle(window, data, center, inner, outer, dt);
         
-        ball.tick(center, data.amplitude / data.smoothedAmplitude * 100, dt);
+        ball.tick(center, dt);
         titleBar.tick("");
 
         window.draw(titleBar);

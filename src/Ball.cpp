@@ -51,7 +51,7 @@ void Ball::addForce(sf::Vector2f f) {
     force += f;
 }
 
-void Ball::tick(sf::Vector2f center, float amplitude, float dt) {
+void Ball::tick(sf::Vector2f center, float dt) {
     if (timeVisible > 0) {
         vel += force * dt;
         force = { 0, 0 };
@@ -60,7 +60,6 @@ void Ball::tick(sf::Vector2f center, float amplitude, float dt) {
         const float posMag = len(pos);
         if (posMag > range) {
             pos /= posMag; // pos is temporary dir
-            addForce(-pos * amplitude * 3000.f);
             vel = vel - pos * bouncy * dot(vel, pos);
             pos *= range;
         }
