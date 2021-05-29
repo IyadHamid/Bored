@@ -11,6 +11,7 @@
 #include "Ball.hpp"
 #include "TitleBar.hpp"
 #include "SampleDraw.h"
+#include "Enviroment.h"
 
 int main() {
     if (!sf::SoundRecorder::isAvailable())
@@ -18,7 +19,7 @@ int main() {
 
     sf::ContextSettings settings{};
     settings.antialiasingLevel = 8;
-    sf::Vector2u res(1024, 1024);
+    sf::Vector2u res(env::resX, env::resY);
     sf::Vector2f center(res.x / 2.f, res.y / 2.f);
     sf::RenderWindow window(sf::VideoMode(res.x, res.y), "Bored", sf::Style::None, settings);
     sf::Clock clock;
@@ -29,19 +30,15 @@ int main() {
 
     TitleBar titleBar(sf::Vector2f(res.x, 32));
 
-    const size_t chunk = 2048;
-    const float inner = 300;
-    const float outer = 200;
-
-    std::vector<double> psamples(chunk);
+    std::vector<double> psamples(env::chunk);
     std::vector<double> windowSample;
-    for (size_t i = 0; i < chunk; i++)
-        windowSample.push_back(hanningWindow(i, chunk));
+    for (size_t i = 0; i < env::chunk; i++)
+        windowSample.push_back(hanningWindow(i, env::chunk));
 
-    Ball ball(25, inner);
+    Ball ball(25, env::inner);
     ball.setPhysics(7000, .0001, 1.5);
 
-    SamplerRecorder input(50);
+    SamplerRecorder input(env::clock);
     input.setDeviceSearch("stereomix");
     input.setChannelCount(2);
     input.start();
@@ -52,7 +49,7 @@ int main() {
 
     bool gainedFocus = false;
 
-    AudioData data(input.getData().first, chunk, windowSample);
+    AudioData data(input.getData().first, env::chunk, windowSample);
 
     while (window.isOpen()) {
 
@@ -108,8 +105,8 @@ int main() {
         data.update(samples.first, samples.second, windowSample, dt);
 
 
-        drawAudioCircle(window, data, center, inner, outer, dt);
-        drawWaveInCircle(window, data, center, inner);
+        drawAudioCircle(window, data, center, env::inner, env::outer, dt);
+        drawWaveInCircle(window, data, center, env::inner);
 
         window.draw(ball);
         

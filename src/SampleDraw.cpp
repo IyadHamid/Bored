@@ -4,11 +4,9 @@
 #include <utility>
 
 #include "CommonMath.h"
+#include "Enviroment.h"
 
 const double modifier(const double x, const double inner, const double outer) {
-    //const auto equ = [outer](double x) {return -outer * std::exp(-0.02 * x); };
-    //const double intercept = equ(0);
-    //return equ(x) - intercept + inner;
     const double r = outer / 2.0;
     const auto equ = [r](double x) {return r * tanh(.03 * (x - 50.0)) + r; };
     const double intercept = equ(0);
@@ -52,7 +50,6 @@ void subdivideCircle(std::vector<sf::Vertex>& va, std::vector<std::pair<double, 
     }
 }
 void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer, double dt) {
-    static const unsigned minResolution = 256;
 
     std::vector<sf::Vertex> va;
     std::vector<std::pair<double, double>> values;
@@ -76,7 +73,7 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
         else if (shift == 0 && !left) [[unlikely]] {
             left = true;
             //Break when frequencies too high, mostly just noise
-            if (va.size() >= 1024) [[unlikely]]
+            if (va.size() >= env::maxResolution) [[unlikely]]
                 break;
 
             //Ignore too low resolutions/frequencies
@@ -84,7 +81,7 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
                 va.push_back(va[0]); //Finish loop
                 values.push_back(values[0]);
                 //Subdivide
-                while (va.size() <= minResolution)
+                while (va.size() <= env::minResolution)
                     subdivideCircle(va, values, inner, outer, center);
                 window.draw(va.data(), va.size(), sf::PrimitiveType::TriangleFan);
             }
@@ -116,8 +113,8 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
 
     //draw inner circle
     va.clear();
-    va.reserve(minResolution);
-    for (double i = 0; i < 2.0 * pi; i += 2.0 * pi / minResolution) {
+    va.reserve(env::minResolution);
+    for (double i = 0; i < 2.0 * pi; i += 2.0 * pi / env::minResolution) {
         const sf::Vector2f pos(inner * cos(i), inner * sin(i));
         va.emplace_back(pos + center, sf::Color::Black);
     }

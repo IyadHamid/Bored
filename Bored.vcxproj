@@ -31,6 +31,7 @@
     <ClInclude Include="include\AudioData.hpp" />
     <ClInclude Include="include\Ball.hpp" />
     <ClInclude Include="include\CommonMath.h" />
+    <ClInclude Include="include\Enviroment.h" />
     <ClInclude Include="include\FFT.h" />
     <ClInclude Include="include\SampleDraw.h" />
     <ClInclude Include="include\SamplerRecorder.hpp" />

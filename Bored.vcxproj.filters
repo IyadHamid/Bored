@@ -61,5 +61,6 @@
     <ClInclude Include="include\AudioData.hpp">
       <Filter>AudioData</Filter>
     </ClInclude>
+    <ClInclude Include="include\Enviroment.h" />
   </ItemGroup>
 </Project>
