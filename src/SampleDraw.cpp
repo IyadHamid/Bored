@@ -46,64 +46,66 @@ void subdivideCircle(std::vector<sf::Vertex>& va, std::vector<std::pair<double, 
 
         values.emplace(values.begin() + i, value, angle);
 
-        const sf::Color color = va[i].color;// vertexColorCircle(value, inner, outer);
         const sf::Vector2f pos(value * sin(angle), value * cos(angle));
-        const sf::Vertex vert(pos + center, color);
 
-        va.insert(va.begin() + i, vert);
+        va.emplace(va.begin() + i, pos + center, va[i].color);
     }
 }
-
 void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f center, double inner, double outer, double dt) {
-    static const unsigned minResolution = 64;
-    
+    static const unsigned minResolution = 256;
 
     std::vector<sf::Vertex> va;
     std::vector<std::pair<double, double>> values;
+    sf::Color color = vertexColorCircle(0);
     bool left = true;
+
     for (size_t i = 0, il = 0, ir = 0; i < data.chunk; i++) {
-        double relativeFreq = std::log2(1 + (left ? il : ir));
+        const double relativeFreq = std::log2(1 + (left ? il : ir));
         //Frequency shift from octave
-        double shift = fmod(relativeFreq, 1.0);
+        double shift = relativeFreq - floor(relativeFreq);
         if (isnan(shift))
             shift = 0;
-
+        
+        //Switch to right side
         if (shift == 0 && left) [[unlikely]] {
             left = false;
             ir = il;
             shift = 1.0;
         }
+        //Switch to left side and draw/finish loop
         else if (shift == 0 && !left) [[unlikely]] {
             left = true;
-
+            //Break when frequencies too high, mostly just noise
             if (va.size() >= 1024) [[unlikely]]
                 break;
 
-            if (va.size() >= 8) {
+            //Ignore too low resolutions/frequencies
+            if (va.size() >= 8) [[likely]] {
                 va.push_back(va[0]); //Finish loop
                 values.push_back(values[0]);
                 //Subdivide
                 while (va.size() <= minResolution)
                     subdivideCircle(va, values, inner, outer, center);
-                window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
+                window.draw(va.data(), va.size(), sf::PrimitiveType::TriangleFan);
             }
 
             va.clear();
             values.clear();
+            //update color for next circle
+            color = vertexColorCircle(relativeFreq);
         }
 
         double angle = shift * pi * (left ? -1.0 : 1.0);
 
         double value = abs(left ? data.samplesL[il].real() : data.samplesR[ir].real());
         value /= data.smoothedAmplitude;
+        value *= sqrt(floor(relativeFreq) / 4.0);
 
-        value = modifier(value, inner, outer - (128.0 / floor(relativeFreq))); 
+        value = modifier(value, inner, outer); 
         values.emplace_back(value, angle);
 
         //inverted sin/cos to rotate pi/2
         const sf::Vector2f pos(value * sin(angle), value * cos(angle));
-
-        const sf::Color color = vertexColorCircle(relativeFreq);
         va.emplace_back(pos + center, color);
 
         if (left)
@@ -117,8 +119,14 @@ void drawAudioCircle(sf::RenderWindow& window, AudioData data, sf::Vector2f cent
     va.reserve(minResolution);
     for (double i = 0; i < 2.0 * pi; i += 2.0 * pi / minResolution) {
         const sf::Vector2f pos(inner * cos(i), inner * sin(i));
-        va.emplace_back(pos + center, sf::Color(0, 255, 255));
+        va.emplace_back(pos + center, sf::Color::Black);
     }
     va.push_back(va[0]);
+
+    window.draw(va.data(), va.size(), sf::PrimitiveType::TriangleFan);
+
+    for (auto& v : va)
+        v.color = sf::Color(0, 255, 255);
+
     window.draw(va.data(), va.size(), sf::PrimitiveType::LineStrip);
 }

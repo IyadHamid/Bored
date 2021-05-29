@@ -107,10 +107,11 @@ int main() {
         auto samples = input.getData();
         data.update(samples.first, samples.second, windowSample, dt);
 
-        window.draw(ball);
 
-        drawWaveInCircle(window, data, center, inner);
         drawAudioCircle(window, data, center, inner, outer, dt);
+        drawWaveInCircle(window, data, center, inner);
+
+        window.draw(ball);
         
         ball.tick(center, dt);
         titleBar.tick("");
